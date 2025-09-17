@@ -13,7 +13,7 @@
 // CORE GAME FUNCTIONS (60 POINTS TOTAL)
 // ========================================
 
-/**
+/**hb
  * Initialize a new game
  * POINTS: 10
  * 
@@ -25,7 +25,7 @@
  */
 function initializeGame() {
     // TODO: Reset game state variables
-    currentWord = '';  // Set this to a random word
+    currentWord = 'WORDS';  // Set this to a random word
     currentGuess = '';
     currentRow = 0;
     gameOver = false;
@@ -33,13 +33,14 @@ function initializeGame() {
     
     // TODO: Get a random word from the word list
     // HINT: Use WordleWords.getRandomWord()
+    currentWord = WordleWords.getRandomWord();
     
     // TODO: Reset the game board
     // HINT: Use resetBoard()
-    
+    resetBoard();
     // TODO: Hide any messages
     // HINT: Use hideModal() and ensure message element is hidden
-    
+    hideModal();
     console.log('Game initialized!'); // Remove this line when implementing
 }
 
@@ -54,20 +55,42 @@ function initializeGame() {
  * - Update the display when letters are added/removed
  */
 function handleKeyPress(key) {
-    // TODO: Check if game is over - if so, return early
-    
+    // TODO: Check if game is over - if so, return early            
+    if (gameOver) return;
     // TODO: Handle letter keys (A-Z)
     // HINT: Use regex /^[A-Z]$/ to test if key is a letter
     // HINT: Check if currentGuess.length < WORD_LENGTH before adding
     // HINT: Use getTile() and updateTileDisplay() to show the letter
+    if (key.match(/^[A-Z]$/)) {
+        if (currentGuess.length < WORD_LENGTH) {
+            currentGuess += key;
+            updateTileDisplay(getTile(currentRow, currentGuess.length - 1),key);
+        }
+    }
+    
+    // Handle BACKSPACE key
+    if (key === 'BACKSPACE') {
+        if (currentGuess.length > 0) {
+            // Remove last letter from currentGuess
+            currentGuess = currentGuess.slice(0, -1);
+            // Clear the tile display for the removed letter
+            updateTileDisplay(getTile(currentRow, currentGuess.length), '');
+        }
+        return;
+    }
     
     // TODO: Handle ENTER key
     // HINT: Check if guess is complete using isGuessComplete()
     // HINT: Call submitGuess() if complete, show error message if not
-    
-    // TODO: Handle BACKSPACE key  
-    // HINT: Check if there are letters to remove
-    // HINT: Clear the tile display and remove from currentGuess
+    if (key === 'ENTER') {
+        if (isGuessComplete()) {
+            submitGuess();
+        } else {
+            showMessage('Not enough letters');
+            shakeRow(currentRow);
+        }
+        return;
+    }
     
     console.log('Key pressed:', key); // Remove this line when implementing
 }
