@@ -25,7 +25,7 @@
  */
 function initializeGame() {
     // TODO: Reset game state variables
-    currentWord = 'WORDS';  // Set this to a random word
+    currentWord = 'TRUCK';  // Set this to a random word
     currentGuess = '';
     currentRow = 0;
     gameOver = false;
@@ -33,7 +33,8 @@ function initializeGame() {
     
     // TODO: Get a random word from the word list
     // HINT: Use WordleWords.getRandomWord()
-    currentWord = WordleWords.getRandomWord();
+    
+    //currentWord = WordleWords.getRandomWord();
     
     // TODO: Reset the game board
     // HINT: Use resetBoard()
@@ -110,27 +111,45 @@ function submitGuess() {
     // HINT: Use isGuessComplete()
     
     // TODO: Validate guess is a real word
+    if (!isValidWord(currentGuess)) {
+        showMessage('Not valid word');
+        shakeRow(currentRow);
+        return;
+    }
     // HINT: Use WordleWords.isValidWord()
     // HINT: Show error message and shake row if invalid
     
     // TODO: Check each letter and get results
     // HINT: Use checkLetter() for each position
     // HINT: Store results in an array
-    
+    let letter_states = [];
+    for (let i = 0; i < currentGuess.length; i++) {
+        letter_states.push(checkLetter(currentGuess.charAt(i), i, currentWord));
+    }
+     
     // TODO: Update tile colors immediately
     // HINT: Loop through results and use setTileState()
+    for (let i = 0; i < currentGuess.length; i++) {
+        setTileState(getTile(currentRow,i), letter_states[i]);
+    }
     
     // TODO: Update keyboard colors
     // HINT: Call updateKeyboardColors()
+    updateKeyboardColors();
+
     
     // TODO: Check if guess was correct
     // HINT: Compare currentGuess with currentWord
+    let isCorrect = currentGuess.toUpperCase() === currentWord.toUpperCase();
     
     // TODO: Update game state
     // HINT: Call updateGameState()
+    updateGameState(isCorrect);
     
     // TODO: Move to next row if game continues
     // HINT: Increment currentRow and reset currentGuess
+    currentRow++;
+    currentGuess = "";
     
     console.log('Guess submitted:', currentGuess); // Remove this line when implementing
 }
@@ -174,6 +193,12 @@ function checkLetter(guessLetter, position, targetWord) {
 function updateGameState(isCorrect) {
     // TODO: Handle win condition
     // HINT: Set gameWon and gameOver flags, call showEndGameModal
+    if (isCorrect) {
+
+    }
+    else {
+        
+    }
     
     // TODO: Handle lose condition  
     // HINT: Check if currentRow >= MAX_GUESSES - 1
