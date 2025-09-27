@@ -25,7 +25,7 @@
  */
 function initializeGame() {
     // TODO: Reset game state variables
-    currentWord = 'APPLE';  // Set this to a random word
+    currentWord = '';  // Set this to a random word
     currentGuess = '';
     currentRow = 0;
     gameOver = false;
@@ -33,7 +33,7 @@ function initializeGame() {
     
     // TODO: Get a random word from the word list
     // HINT: Use WordleWords.getRandomWord()
-    
+    currentWord = WordleWords.getRandomWord();
     //currentWord = WordleWords.getRandomWord();
     
     // TODO: Reset the game board
@@ -183,7 +183,7 @@ function submitGuess() {
     
     // TODO: Update keyboard colors
     // HINT: Call updateKeyboardColors()
-    updateKeyboardColors();
+    updateKeyboardColors(currentGuess, letter_states);
 
     
     // TODO: Check if guess was correct
@@ -274,16 +274,24 @@ function updateGameState(isCorrect) {
  * - Don't downgrade key colors
  */
 function updateKeyboardColors(guess, results) {
-    // TODO: Loop through each letter in the guess
-    
-    // TODO: Get the keyboard key element
-    // HINT: Use document.querySelector with [data-key="LETTER"]
-    
-    // TODO: Apply color with priority system
-    // HINT: Don't change green keys to yellow or gray
-    // HINT: Don't change yellow keys to gray
-    
-    console.log('Updating keyboard colors for:', guess); // Remove this line
+    // Loop through each letter in the guess
+    for (let i = 0; i < guess.length; i++) {
+        let letter = document.querySelector(`[data-key="${guess.charAt(i)}"]`);
+        if (!letter) continue; // Skip if key not found
+        
+        // Apply color with priority system
+        // Don't change green keys to yellow or gray
+        // Don't change yellow keys to gray
+        if (results[i] === 'correct') {
+            letter.classList.remove('present', 'absent');
+            letter.classList.add('correct');
+        } else if (results[i] === 'present' && !letter.classList.contains('correct')) {
+            letter.classList.remove('absent');
+            letter.classList.add('present');
+        } else if (results[i] === 'absent' && !letter.classList.contains('correct') && !letter.classList.contains('present')) {
+            letter.classList.add('absent');
+        }
+    }
 }
 
 /**
@@ -300,7 +308,9 @@ function processRowReveal(rowIndex, results) {
     
     // TODO: If all correct, trigger celebration
     // HINT: Use celebrateRow() function
-    
+    if (results.every(result => result === 'correct')) {
+        celebrateRow(rowIndex);
+    }                   
     console.log('Processing row reveal for row:', rowIndex); // Remove this line
 }
 
@@ -350,16 +360,16 @@ function showEndGameModal(won, targetWord) {
  */
 function validateInput(key, currentGuess) {
     // TODO: Return false if game is over
-    
+    if (gameOver) return false;
     // TODO: Handle letter keys
     // HINT: Check if currentGuess.length < WORD_LENGTH
-    
+    if (currentGuess.length < WORD_LENGTH) return false;
     // TODO: Handle ENTER key
     // HINT: Check if currentGuess.length === WORD_LENGTH
-    
+    if (currentGuess.length === WORD_LENGTH) return false;
     // TODO: Handle BACKSPACE key
     // HINT: Check if currentGuess.length > 0
-    
+    if (currentGuess.length > 0) return false;
     console.log('Validating input:', key); // Remove this line
     return true; // Replace with actual validation logic
 }
