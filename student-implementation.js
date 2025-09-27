@@ -25,7 +25,7 @@
  */
 function initializeGame() {
     // TODO: Reset game state variables
-    currentWord = 'TRUCK';  // Set this to a random word
+    currentWord = 'APPLE';  // Set this to a random word
     currentGuess = '';
     currentRow = 0;
     gameOver = false;
@@ -123,8 +123,56 @@ function submitGuess() {
     // HINT: Use checkLetter() for each position
     // HINT: Store results in an array
     let letter_states = [];
+    
+    // First pass: mark all correct letters
     for (let i = 0; i < currentGuess.length; i++) {
-        letter_states.push(checkLetter(currentGuess.charAt(i), i, currentWord));
+        if (currentGuess.charAt(i).toUpperCase() === currentWord.charAt(i).toUpperCase()) {
+            letter_states[i] = 'correct';
+        } else {
+            letter_states[i] = null; // Will be filled in second pass
+        }
+    }
+    
+    // Second pass: handle present and absent letters with proper duplicate handling
+    for (let i = 0; i < currentGuess.length; i++) {
+        if (letter_states[i] === null) { // Not already marked as correct
+            let guessLetter = currentGuess.charAt(i).toUpperCase();
+            
+            // Count how many times this letter appears in target (not already marked as correct)
+            let targetCount = 0;
+            for (let j = 0; j < currentWord.length; j++) {
+                if (currentWord.charAt(j).toUpperCase() === guessLetter && letter_states[j] !== 'correct') {
+                    targetCount++;
+                }
+            }
+            
+            // Count how many times this letter appears in guess (not already marked as correct)
+            let guessCount = 0;
+            for (let j = 0; j < currentGuess.length; j++) {
+                if (currentGuess.charAt(j).toUpperCase() === guessLetter && letter_states[j] !== 'correct') {
+                    guessCount++;
+                }
+            }
+            
+            // Determine if this letter should be marked as present
+            if (targetCount > 0) {
+                // Check if we haven't already used up all instances of this letter
+                let usedCount = 0;
+                for (let j = 0; j < i; j++) {
+                    if (currentGuess.charAt(j).toUpperCase() === guessLetter && letter_states[j] === 'present') {
+                        usedCount++;
+                    }
+                }
+                
+                if (usedCount < targetCount) {
+                    letter_states[i] = 'present';
+                } else {
+                    letter_states[i] = 'absent';
+                }
+            } else {
+                letter_states[i] = 'absent';
+            }
+        }
     }
      
     // TODO: Update tile colors immediately
@@ -166,19 +214,21 @@ function submitGuess() {
  */
 function checkLetter(guessLetter, position, targetWord) {
     // TODO: Convert inputs to uppercase for comparison
+    guessLetter = guessLetter.toUpperCase();
+    targetWord = targetWord.toUpperCase();
     
     // TODO: Check if letter is in correct position
     // HINT: Compare targetWord[position] with guessLetter
+    if (guessLetter === targetWord[position]) {
+        return 'correct';
+    }
     
-    // TODO: Check if letter exists elsewhere in target
-    // HINT: Use targetWord.includes() or indexOf()
+    // Check if letter exists elsewhere in target
+    if (targetWord.includes(guessLetter)) {
+        return 'present';
+    }
     
-    // TODO: Handle duplicate letters correctly
-    // This is the most challenging part - you may want to implement
-    // a more sophisticated algorithm that processes the entire word
-    
-    console.log('Checking letter:', guessLetter, 'at position:', position); // Remove this line
-    return 'absent'; // Replace with actual logic
+    return 'absent';
 }
 
 /**
@@ -188,20 +238,24 @@ function checkLetter(guessLetter, position, targetWord) {
  * TODO: Complete this function to:
  * - Check if player won (guess matches target)
  * - Check if player lost (used all attempts)
- * - Show appropriate end game modal
+ * - Show appropriate  game modal
  */
 function updateGameState(isCorrect) {
     // TODO: Handle win condition
     // HINT: Set gameWon and gameOver flags, call showEndGameModal
     if (isCorrect) {
-
-    }
-    else {
-        
+        gameWon = true;
+        gameOver = true;
+        showEndGameModal();
+        return;
     }
     
     // TODO: Handle lose condition  
     // HINT: Check if currentRow >= MAX_GUESSES - 1
+    if (currentRow >= MAX_GUESSES - 1) {
+        gameOver = true;
+        showEndGameModal(false, currentWord);
+    }
     
     console.log('Game state updated. Correct:', isCorrect); // Remove this line
 }
@@ -263,14 +317,25 @@ function showEndGameModal(won, targetWord) {
     // TODO: Create appropriate message based on won parameter
     // HINT: For wins, include number of guesses used
     // HINT: For losses, reveal the target word
+    if (won === true) {
+        showMessage('You won!', 'success');
+        updateStats(true);
+        showModal(true, currentWord, currentRow + 1); // +1 because currentRow is 0-indexed
+    }
+    else {
+        showMessage('Game Over!', 'error');
+        updateStats(false);
+        showModal(false, currentWord, MAX_GUESSES); // Show total attempts used
+    }
     
     // TODO: Update statistics
     // HINT: Use updateStats() function
+    // DONE: Called above
+
     
     // TODO: Show the modal
     // HINT: Use showModal() function
-    
-    console.log('Showing end game modal. Won:', won, 'Word:', targetWord); // Remove this line
+    // DONE: Called above
 }
 
 /**
@@ -303,9 +368,9 @@ function validateInput(key, currentGuess) {
 // DEBUGGING HELPERS (REMOVE BEFORE SUBMISSION)
 // ========================================
 
-// Uncomment these lines for debugging help:
-// console.log('Current word:', currentWord);
-// console.log('Current guess:', currentGuess);
-// console.log('Current row:', currentRow);
+//Uncomment these lines for debugging help:
+    console.log('Current word:', currentWord); 
+    console.log('Current guess:', currentGuess);
+ console.log('Current row:', currentRow);
 
 console.log('Student implementation template loaded. Start implementing the functions above!'); 

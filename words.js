@@ -86,6 +86,7 @@ const VALID_WORDS = [
 
 // Additional common words for validation (students can guess these but they won't be answers)
 const ADDITIONAL_VALID_WORDS = [
+    "ERASE","LLLKL",
     "ABACK", "ABASE", "ABATE", "ABBEY", "ABBOT", "ABHOR", "ABIDE", "ABLED", "ABODE", "ABORT",
     "ABOUND", "ABRUPT", "ABSURD", "ACCENT", "ACCEPT", "ACCESS", "ACCORD", "ACCRUE", "ACCUSE", "ACHED",
     "ACIDS", "ACORN", "ACRES", "ACTED", "ACTOR", "ADDED", "ADDER", "ADEPT", "ADMIN", "ADOBE",
